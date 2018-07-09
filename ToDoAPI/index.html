@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>function getBaseUrl() {
+            return document.getElementById("url").value;
+        }
+        function clearValue(elementId) {
+            document.getElementById(elementId).value = '';
+        }
+        function getAll() {
+            const all = document.getElementById("all");
+            all.innerHTML = "";
+            fetch(getBaseUrl() + "todo")
+                .then(res => res.json())
+                .then((data) => {
+                    data.forEach(item => {
+                        const li = document.createElement("li");
+                        li.innerText = item.Id + ' - ' + item.Name + ' Priority: ' + item.Priority;
+                        all.appendChild(li);
+                    })
+                });
+        }
+        function create() {
+            const newTodo = {
+                Id: document.getElementById('id').value,
+                Name: document.getElementById('name').value,
+                Priority: document.getElementById('priority').value
+            }
+            fetch(getBaseUrl() + 'todo', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newTodo)
+            }).then(() => {
+                clearValue('id');
+                clearValue('name');
+                clearValue('priority');
+            }).catch(console.error);
+        }
+        function deleteTodo() {
+            const id = document.getElementById('deleteId').value;
+            fetch(getBaseUrl() + 'todo?id=' + id, { method: 'DELETE' })
+                .then(() => {
+                    clearValue('deleteId');
+                }).catch(console.error);
+        }</script>
+</head>
+<body>
+    <section>
+        API Base Url: <input type="text" id="url" value="http://localhost:60015/api/" />
+    </section>
+    <section>
+        <h2>Show All Todos</h2>
+        <ul id="all"></ul>
+        <input type="button" onclick="getAll()" value="Get All" />
+    </section>
+    <section>
+        <form>
+            <h2>Create a Todo</h2>
+            Id: <input type="text" id="id" />
+            Name: <input type="text" id="name" />
+            Priority <input type="number" id="priority" />
+            <input type="button" onclick="create()" value="Create" />
+        </form>
+    </section>
+    <section>
+        <form>
+            <h2>Delete a Todo</h2>
+            Id: <input type="text" id="deleteId" />
+            <input type="button" onclick="deleteTodo()" value="Delete" />
+        </form>
+    </section>
+</body>
+</html>
